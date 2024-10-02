@@ -9,13 +9,6 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import os
-import tkinter as tk 
-from tkinter import Label
-import matplotlib.pyplot as plt 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-
-
 
 # Loading the dataset 
 data_path = 'C:\\Users\\Owner\\Cos7008\\Merge_DataSet.csv'
@@ -24,11 +17,12 @@ if not os.path.exists(data_path):
     raise FileNotFoundError(f"The file {data_path} does not exist.")
 merged_df1 = pd.read_csv(data_path)
 
-# Print  DataFrame for d bug
+# Print DataFrame for debugging
 print(merged_df1.head())  
 print(merged_df1.info())  
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
 # App layout
 app.layout = html.Div(children=[
     html.H1(children='TechSafe: Threat Actor Scoring Dashboard'),
@@ -38,57 +32,78 @@ app.layout = html.Div(children=[
         placeholder='Select a threat actor'
     ),
     html.Div(id='threat-details'),
-    # tab
-    dcc.Tabs(id='graph-tabs', value='bar', children=[
-        dcc.Tab(label='Line Chart', value='bar'),
-        dcc.Tab(label='Heat Map', value='heatmap'),
-        dcc.Tab(label='Pie chart', value='pie'),
+    
+    # Bar Graph Section
+    html.Div([
+        html.H2('Bar Graph: Complexity Score by Threat Actor'),
+        dcc.Graph(id='bar-graph'),
     ]),
-    html.Div(id='graph-content'),
+    
+    # Heatmap Section
+    html.Div([
+        html.H2('Heatmap: Technique Correlations'),
+        html.Div(id='heatmap-container'),
+    ]),
+    
+    # Pie Chart Section
+    html.Div([
+        html.H2('Pie Chart: Count of Threat Actors'),
+        dcc.Graph(id='pie-graph'),
+    ]),
 ])
 
 
+# Callback to update bar graph
 @app.callback(
-    Output('graph-content', 'children'),
-    Input('graph-tabs', 'value')
+    Output('bar-graph', 'figure'),
+    Input('threat-dropdown-menu', 'value')
 )
-def tab_content(pick_tab):
-    if pick_tab == 'bar':
-        # Placeholder bar graph (you can customize it with appropriate x, y values)
-        bar_fig = px.bar(merged_df1, x='name', y='complexity_score',
-                         title="Complexity Score by Threat Actor",
-                         labels={'complexity_score': 'Complexity Score', 'name': 'Threat Actor'})
-        return dcc.Graph(id='bar-graph', figure=bar_fig)
+def update_bar_graph(pick_threat):
+    # Placeholder bar graph (you can customize it with appropriate x, y values)
+    bar_fig = px.bar(merged_df1, x='name', y='complexity_score',
+                     title="Complexity Score by Threat Actor",
+                     labels={'complexity_score': 'Complexity Score', 'name': 'Threat Actor'})
+    return bar_fig
 
-    elif pick_tab == 'heatmap':
-        # Create heatmap using seaborn
-        plt.figure(figsize=(10, 8))
-        techniques_one_hot = pd.get_dummies(merged_df1['technique'])
-        corr_matrix = techniques_one_hot.corr()
-        sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
-        plt.title('Heatmap of Technique Correlations')
 
-        # Save the plot to a PNG image
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        plt.close()
-        buf.seek(0)
-        encoded_image = base64.b64encode(buf.read()).decode('ascii')
+# Callback to generate heatmap image
+@app.callback(
+    Output('heatmap-container', 'children'),
+    Input('threat-dropdown-menu', 'value')
+)
+def update_heatmap(pick_threat):
+    plt.figure(figsize=(10, 8))
+    techniques_one_hot = pd.get_dummies(merged_df1['technique'])
+    corr_matrix = techniques_one_hot.corr()
+    sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+    plt.title('Heatmap of Technique Correlations')
 
-        # Create an image tag for the heatmap
-        return html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'width': '100%', 'height': 'auto'})
+    # Save the plot to a PNG image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    encoded_image = base64.b64encode(buf.read()).decode('ascii')
 
-    elif pick_tab == 'pie':
-            pie_data = merged_df1['name'].value_counts().reset_index()
-            pie_data.columns = ['name', 'count']
-            
-            pie_fig = px.pie(pie_data, values='count', names='name',
+    # Return the image as a base64-encoded string
+    return html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'width': '100%', 'height': 'auto'})
+
+
+# Callback to update pie chart
+@app.callback(
+    Output('pie-graph', 'figure'),
+    Input('threat-dropdown-menu', 'value')
+)
+def update_pie_chart(pick_threat):
+    pie_data = merged_df1['name'].value_counts().reset_index()
+    pie_data.columns = ['name', 'count']
+    
+    pie_fig = px.pie(pie_data, values='count', names='name',
                      title="Count of Threat Actors")
-            
-    return dcc.Graph(id='pie-graph', figure=pie_fig)
+    return pie_fig
 
 
-# Callback for dropdown selection 
+# Callback for dropdown selection
 @app.callback(
     Output('threat-details', 'children'),
     [Input('threat-dropdown-menu', 'value')]
@@ -104,6 +119,7 @@ def change_threat_details(pick_threat):
         ])
     else:
         return "Select a threat actor to see details."
+
 
 # Run the Dash app
 if __name__ == '__main__':
