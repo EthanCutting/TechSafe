@@ -1,0 +1,71 @@
+/* General body styling */
+body {
+    background-color: #1c1c1e; /* Dark background */
+    color: #e0e0e0; /* Light text for readability */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Header styles */
+h1 {
+    color: #ffffff; /* White text */
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Section headers */
+h2 {
+    color: #d1d1d1; /* Light gray text */
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+/* Logo section */
+.logo-container {
+    border: 2px solid #444; /* Add a border around the logo */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Box shadow for depth */
+    background-color: #333; /* Dark background for the logo */
+}
+
+/* Dropdown Styling */
+.dccDropdown {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #3a3a3c; /* Dark background */
+    color: #ffffff; /* Light text color */
+    border: 1px solid #555; /* Border for dropdown */
+}
+
+/* Graph container styling */
+.graph-container, .section-container {
+    background-color: #2e2e2e; /* Lighter container background */
+    border: 2px solid #444; /* Border around each graph container */
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+    color: #e0e0e0; /* Light text */
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 14px;
+    color: #888; /* Lighter gray for footer text */
+}
+
+/* Add hover effect to dropdowns */
+.dccDropdown:hover {
+    background-color: #444; /* Darker hover effect */
+    color: #ffffff;
+}
