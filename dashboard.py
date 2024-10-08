@@ -35,11 +35,11 @@ app.layout = html.Div(children=[
     html.Div([
         html.Img(src='/assets/techsafe-high-resolution-logo-transparent.png', 
                  style={'width': '500px', 'display': 'block', 'margin': 'auto'}),
-    ], className='logo-container'),  # Added logo-container class
+    ], className='logo-container'),  
     
     # Pie Chart Section for Top Threat Actors
     html.Div([
-        html.H2('Pie Chart: Top Threat Actors'),
+        html.H2('Pie Chart'),
         dcc.Graph(id='top-threat-actors-pie'),
         
         # Year Dropdown for Pie Chart
@@ -52,12 +52,12 @@ app.layout = html.Div(children=[
         ),
         html.P("Select a year to view the top 5 threat actors for that specific year."),  # Text description
     ], className='section-container'),  
-    
-    # Heatmap container 
-    html.Div(id='heatmap-container', className='section-container'), 
 
+   
     # Dropdown for the heatmap
     html.Div([
+        # Heatmap container 
+        html.Div(id='heatmap-container', className='section-container'), 
         html.H2('Select a Threat Actor for Heatmap'),
         dcc.Dropdown(
             id='threat-dropdown-menu',
@@ -68,6 +68,8 @@ app.layout = html.Div(children=[
 
     # Threat Actor Activity Timeline section
     html.Div([
+        html.H2('Timeline'),
+
         dcc.Graph(id='activity-graph'),
         html.H2('Select a Threat Actor for Timeline'),
         dcc.Dropdown(
@@ -190,3 +192,4 @@ def plot_activity(actor):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+ 
