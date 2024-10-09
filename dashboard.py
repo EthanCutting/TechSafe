@@ -13,7 +13,7 @@ import plotly.graph_objs as go
 import os
 
 # Loading the dataset 
-data_path = 'C:/Users/ethan/Desktop/TechSafe-main/TechSafe-main/Dataset/merged_data.csv'
+data_path = 'D:/Users/Owner/Downloads/TechSafe-main/Dataset/merged_data.csv'
 
 if not os.path.exists(data_path):
     raise FileNotFoundError(f"The file {data_path} does not exist.")
@@ -86,7 +86,9 @@ app.layout = html.Div(children=[
     Output('heatmap-container', 'children'),
     Input('threat-dropdown-menu', 'value')
 )
-def update_heatmap(pick_threat):
+# Output('heatmap-container', 'children') - The callback will update the content (children) of the div with ID 'heatmap-container'
+# Input('threat-dropdown-menu', 'value') - The input is the value selected in the dropdown menu with ID 'threat-dropdown-menu'
+def heatmap(pick_threat):
     df_filtered = merged_df1[['name', 'technique']].copy() 
     df_filtered['technique'] = df_filtered['technique'].str.split(',')
     df_exploded = df_filtered.explode('technique')
@@ -96,10 +98,10 @@ def update_heatmap(pick_threat):
         z=heatmap_data.values,
         x=heatmap_data.columns,
         y=heatmap_data.index,
-        colorscale='YlGnBu',
+        colorscale='Jet', # Jet, Plasma, Viridis
         colorbar=dict(title='Count')
     ))
-
+    # Adds annotations (numbers) to the heatmap for each cell
     annotations = []
     for i, row in enumerate(heatmap_data.index):
         for j, col in enumerate(heatmap_data.columns):
@@ -110,11 +112,11 @@ def update_heatmap(pick_threat):
                     y=row,
                     text=str(value),
                     showarrow=False,
-                    font=dict(color='white')
+                    font=dict(color='white', size=12)
                 )
             )
 
-    # Set the lighter background for the heatmap container
+    # Updates the layout of the heatmap with color
     heatmap_fig.update_layout(
         title='Technique Correlations',
         paper_bgcolor='#2e2e2e', 
@@ -124,19 +126,20 @@ def update_heatmap(pick_threat):
         xaxis_title='Threat Actors',
         yaxis_title='Techniques',
         annotations=annotations,
-        height=1500,
-        width=1500,
+        height=1000,
+        width=1200,
         xaxis=dict(tickangle=-45, tickfont=dict(color='#e0e0e0')),
         yaxis=dict(tickfont=dict(color='#e0e0e0'))
     )
     return dcc.Graph(figure=heatmap_fig)
 
-
-# Callback for the pie chart 
+# Output('top-threat-actors-pie', 'figure') - The callback will update the figure (graph) of the component with ID 'top-threat-actors-pie'
+# Input('year-dropdown', 'value') - The input is the value selected in the dropdown menu with ID 'year-dropdown'
 @app.callback(
     Output('top-threat-actors-pie', 'figure'),
     Input('year-dropdown', 'value')
 )
+# Creates a pie chart using Plotly Express
 def update_pie_chart(selected_year):
     merged_df1['Year'] = merged_df1['created_x'].dt.year
     yearly_actor_counts = merged_df1.groupby(['Year', 'name']).size().reset_index(name='Counts')
@@ -146,7 +149,7 @@ def update_pie_chart(selected_year):
     pie_fig = px.pie(top_actors, values='Counts', names='name',
                      title=f'Top {top_n} Threat Actors in {selected_year}',
                      hole=0.3)
-     # Set the lighter background for the pie chart container
+    #
     pie_fig.update_layout(
         paper_bgcolor='#2e2e2e',  
         plot_bgcolor='#2e2e2e',   
@@ -159,7 +162,8 @@ def update_pie_chart(selected_year):
     )
     return pie_fig
 
-# Callback for timeline graph
+# Output('activity-graph', 'figure') - The callback will update the figure (graph) of the component with ID 'activity-graph'.
+# Input('actor-activity-dropdown', 'value') - The input is the value selected in the dropdown menu with ID 'actor-activity-dropdown'.
 @app.callback(
     Output('activity-graph', 'figure'),
     Input('actor-activity-dropdown', 'value')
@@ -174,7 +178,7 @@ def plot_activity(actor):
             mode='lines+markers',
             name=actor
         ))
-        # Set the lighter background for the graph container
+        
         activity_fig.update_layout(
             title=f'Timeline of {actor} Activity over time',
             xaxis_title='Time (Year-Month)',
